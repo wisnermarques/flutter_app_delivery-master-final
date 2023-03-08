@@ -209,7 +209,7 @@ Widget _totalContainer(context, model) {
                 model.finalizarCompra();
                 model.itensCarrinho.clear;
                 model.dadosPedido.clear;
-                Navigator.of(context).pushNamed('/pedido');
+                Navigator.of(context).pushNamed('/pedidos');
               }
             },
             style: ElevatedButton.styleFrom(

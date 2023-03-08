@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_delivery/src/pages/detalhe_pedido.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -32,8 +33,11 @@ class MeusPedidosState extends State<MeusPedidos> {
                     .meusPedidos['data']['attributes']['pedidos']['data']
                     .length,
                 itemBuilder: (context, index) {
+                  int totalItens = model
+                      .meusPedidos['data']['attributes']['pedidos']['data']
+                      .length;
                   var pedido = model.meusPedidos['data']['attributes']
-                      ['pedidos']['data'][index];
+                      ['pedidos']['data'][totalItens - 1 - index];
 
                   var dataFormatada = DateFormat('dd/MM/yyyy', 'pt_BR').format(
                       DateTime.parse(pedido['attributes']['createdAt']));
@@ -78,6 +82,13 @@ class MeusPedidosState extends State<MeusPedidos> {
                             ElevatedButton(
                               onPressed: () {
                                 // implementar ação para exibir detalhes do pedido
+                                //print(pedido['attributes']['dadosPedido']);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DetalhePedido(idPedido: pedido['id']),
+                                    ));
                               },
                               child: const Text('Mais Detalhes'),
                             ),
