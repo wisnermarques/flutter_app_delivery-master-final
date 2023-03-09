@@ -70,9 +70,11 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         model.loginUser(
-                            email: emailController.text,
-                            password: senhaController.text);
-                        Navigator.of(context).pushReplacementNamed('/carrinho');
+                          email: emailController.text,
+                          password: senhaController.text,
+                          onSuccess: _onSuccess,
+                          onFail: _onFail,
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -143,5 +145,19 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     });
+  }
+
+  void _onSuccess() {
+    Navigator.of(context).pushReplacementNamed('/carrinho');
+  }
+
+  void _onFail() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Falha ao realizar login!'),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 }

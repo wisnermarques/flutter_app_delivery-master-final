@@ -21,43 +21,52 @@ class UserModel extends Model {
 
   late int idCliente = 0;
 
-  loginUser({required String email, required String password}) async {
+  Future<void> loginUser({
+    required String email,
+    required String password,
+    required void Function() onSuccess,
+    required void Function() onFail,
+  }) async {
     var data = {'identifier': email, 'password': password};
-    await http
-        .post(
+    final response = await http.post(
       Uri.parse('https://apidelivery-production.up.railway.app/api/auth/local'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(data),
-    )
-        .then((response) async {
-      if (response.statusCode == 200) {
-        isLoading = false;
+    );
 
-        userLogado = jsonDecode(response.body);
-        notifyListeners();
+    if (response.statusCode == 200) {
+      isLoading = false;
 
-        Uri url = Uri.https('apidelivery-production.up.railway.app',
-            'api/users/${userLogado['user']['id']}', {'populate': '*'});
+      userLogado = jsonDecode(response.body);
+      // Login bem sucedido
+      onSuccess();
+      notifyListeners();
 
-        await http.get(
-          url,
-          headers: {
-            'Authorization': 'Bearer ${userLogado['jwt']}',
-          },
-        ).then((userCliente) {
-          var dados = json.decode(userCliente.body);
-          idCliente = dados['cliente']['id'];
+      Uri url = Uri.https('apidelivery-production.up.railway.app',
+          'api/users/${userLogado['user']['id']}', {'populate': '*'});
 
-          notifyListeners();
-        });
-      } else if (response.statusCode == 400) {
-        isLoading = false;
+      final responseCliente = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${userLogado['jwt']}',
+        },
+      );
+      if (responseCliente.statusCode == 200) {
+        var dados = json.decode(responseCliente.body);
+        idCliente = dados['cliente']['id'];
 
         notifyListeners();
       }
-    });
+    } else if (response.statusCode == 400) {
+      isLoading = false;
+
+      notifyListeners();
+    } else {
+      // Login falhou
+      onFail();
+    }
   }
 
   bool isLoggedIn() {
